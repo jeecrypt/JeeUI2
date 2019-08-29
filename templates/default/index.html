@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="css/pure-min.css">
+    <link rel="stylesheet" href="css/side-menu.css">
+    <link rel="stylesheet" href="css/range.css">
+</head>
+<body onload="parse()">
+    <div id="layout">
+        <a href="#menu" id="menuLink" class="menu-link">
+            <span></span>
+        </a>
+        <div id="menu"></div>
+        <div id="main">
+            <div class="header">
+                <h1>Page Title</h1>
+            </div>
+            <div class="content">
+                <form class="pure-form pure-form-stacked">
+                    <fieldset>
+
+                            <div class="pure-u-1 pure-u-md-1-3">
+                                <label for="first-name">First Name</label>
+                                <input id="first-name" class="pure-u-23-24" type="text">
+                            </div>
+                
+                            <div class="pure-u-1 pure-u-md-1-3">
+                                <label for="last-name">Last Name</label>
+                                <input id="last-name" class="pure-u-23-24" type="text">
+                            </div>
+                
+                            <div class="pure-u-1 pure-u-md-1-3">
+                                <label for="email">E-Mail</label>
+                                <input id="email" class="pure-u-23-24" type="email" required>
+                            </div>
+                
+                            <div class="pure-u-1 pure-u-md-1-3">
+                                <label for="city">City</label>
+                                <input id="city" class="pure-u-23-24" type="color" 
+                                value="color">
+                            </div>
+                
+                            <div class="pure-u-1 pure-u-md-1-3">
+                                <label for="state">State</label>
+                                <select id="state" class="pure-input-1-2">
+                                    <option>AL</option>
+                                    <option>CA</option>
+                                    <option>IL</option>
+                                </select>
+                            </div>
+
+                            <div class="pure-u-1 pure-u-md-1-3">
+                                    <label id="range-val">Вокак: 50</label>
+                                    <input id="range" type="range" oninput="showCount(this.id, this.value, 'Вокак')">
+                                </div>
+                
+                        <label for="terms" class="pure-checkbox">
+                            <input id="terms" type="checkbox"> I've read the terms and conditions
+                        </label>
+                
+                        <button type="submit" class="pure-button pure-button-primary">Submit</button>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+        <div id="content"></div>
+        <div id="debug"></div>
+
+
+    </div>
+    <script src="js/ui.js"></script>
+    <script src="js/maker.js"></script>
+</body>
+</html>
