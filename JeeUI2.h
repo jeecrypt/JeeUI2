@@ -56,6 +56,7 @@ class jeeui2
     void button(String id, String color, String label, int column);
     void textarea(String id, String label);
     void save();
+    void udp(String message);
     
     uiCallback foo;
     void ui(void (*uiFunction) ());
@@ -103,6 +104,7 @@ class jeeui2
     bool wf = false;
     uint8_t pg = 0;
     String btnui = "";
+    String udpMessage;
     
     bool dbg = false;
     

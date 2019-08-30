@@ -3,9 +3,15 @@
 #include <WiFiUdp.h>
 
 WiFiUDP Udp;
+bool udpApply = false;
+
+void jeeui2::udp(String message){
+    udpMessage = message;
+}
 
 void jeeui2::udpBegin(){
     Udp.begin(localUdpPort);
+    if(udpMessage != "") udpApply = true;
 }
 
 void jeeui2::udpLoop(){
@@ -14,6 +20,9 @@ void jeeui2::udpLoop(){
         st = true;
         udpBegin();
     }
+
+    if(!udpApply) return;
+
     int packetSize = Udp.parsePacket();
     if (packetSize)
     {
@@ -29,7 +38,8 @@ void jeeui2::udpLoop(){
         // send back a reply, to the IP address and port we got the packet from
         Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
         //Udp.write(ip.c_str());
-        Udp.print(ip.c_str());
+        if(dbg)Serial.println("Send UDP: " + udpMessage);
+        Udp.print(udpMessage);
         Udp.endPacket();
     }
 }
