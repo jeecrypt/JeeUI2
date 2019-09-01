@@ -33,7 +33,6 @@ class jeeui2
     void begin();
     void begin(bool debug);
     void handle();
-    void btn();
     void btnCallback(String name ,buttonCallback response);
 
     void app(String name);
@@ -85,6 +84,7 @@ class jeeui2
     void prntmac();
     void udpBegin();
     void udpLoop();
+    void btn();
 
     String udpRemoteIP;
     unsigned int localUdpPort = 4243;

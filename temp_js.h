@@ -109,7 +109,7 @@ function content_item(item, i){
             content += "oninput=\"datarange(this.id, this.value, '" + item.label + "')\" onchange=\"data('" + item.type + "', this.id, this.value, '" + item.label + "', " + page + ", " + i + ")\">";
         }
 
-        if(item.type == "text" || item.type == "password" || item.type == "time" || item.type == "date" || item.type == "datetime-local"){
+        if(item.type == "text" || item.type == "password" || item.type == "number" || item.type == "time" || item.type == "date" || item.type == "datetime-local"){
             content += "oninput=\"data('" + item.type + "', this.id, this.value, '" + item.label + "', " + page + ", " + i + ")\">";
         }
 

@@ -140,7 +140,7 @@ void jeeui2::begin() {
 
 void jeeui2::led(uint8_t pin, bool invert)
 {
-    if (LED_PIN == -1) return;
+    if (pin == -1) return;
     LED_PIN = pin;
     LED_INVERT = invert;
     pinMode(LED_PIN, OUTPUT);
