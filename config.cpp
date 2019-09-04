@@ -17,6 +17,7 @@ void jeeui2::autosave(){
         sv = false;
         if(dbg)Serial.println("AutoSave");
         upd();
+        mqtt_update();
     } 
 }
 

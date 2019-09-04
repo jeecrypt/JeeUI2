@@ -1,9 +1,13 @@
 #include "JeeUI2.h"
-
 #include <WiFiUdp.h>
 
 WiFiUDP Udp;
 bool udpApply = false;
+
+void jeeui2::udp(){
+    getAPmac();
+    udpMessage = mc;
+}
 
 void jeeui2::udp(String message){
     udpMessage = message;

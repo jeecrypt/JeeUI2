@@ -1,10 +1,26 @@
 #include "JeeUI2.h"
 
 
+void jeeui2::formMqtt(){
+    text("m_host", "MQTT host");
+    number("m_port", "MQTT port");
+    text("m_user", "User");
+    text("m_pass", "Password");
+}
+
+void jeeui2::formWifi(){
+    text("ssid", "SSID");
+    password("pass", "Password");
+    button("bWF", "gray", "Connect");
+}
+
+
+
 void jeeui2::app(String name){
     mn = 0;
     pg = 0;
     buf = "{\"app\":\"" + name + "\",";
+    buf += "\"ID\":\"" + mc + "\",";
 }
 
 void jeeui2::text(String id, String label){

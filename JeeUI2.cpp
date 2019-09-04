@@ -2,7 +2,12 @@
  
 */ 
 
+
+
 #include "JeeUI2.h"
+
+
+
 #include "pge.h"
 #include "stl.h"
 #include "mnu.h"
@@ -67,7 +72,14 @@ void jeeui2::begin() {
         for (uint8_t i = 0; i < params; i++)
         {
           p = request->getParam(i);
-          if (p->name().indexOf("BTN_") != -1) btnui = p->name().substring(4, p->name().length());
+          if (p->name().indexOf("BTN_") != -1){
+                btnui = p->name().substring(4, p->name().length());
+                if(btnui == "bWF"){
+                    var("wifi", "STA");
+                    save();
+                    ESP.restart();
+                }
+          } 
           else {
             var(p->name(), p->value());
             as();
@@ -134,8 +146,10 @@ void jeeui2::begin() {
     // });
 
     server.begin();
-    
+    // rc(m_callback);
     upd();
+    mqtt_update();
+    
 }
 
 void jeeui2::led(uint8_t pin, bool invert)
@@ -148,6 +162,7 @@ void jeeui2::led(uint8_t pin, bool invert)
 
 void jeeui2::handle()
 {
+    mqtt_handle();
     udpLoop();
     static unsigned long timer;
     unsigned int interval = 300;
@@ -157,17 +172,12 @@ void jeeui2::handle()
     btn();
     led_handle();
     autosave();
+ 
 }
 
 
 void jeeui2::nonWifiVar(){
-    #ifdef ESP32
-    WiFi.mode(WIFI_MODE_AP);
-    #else
-    WiFi.mode(WIFI_AP);
-    #endif
-    String mc = String(WiFi.softAPmacAddress());
-    mc.replace(":", "");
+    getAPmac();
     String wifi = param("wifi");
     String ssid = param("ssid");
     String pass = param("pass");
@@ -180,3 +190,13 @@ void jeeui2::nonWifiVar(){
     if(ap_pass == "null") var("ap_pass", "");
 }
 
+void jeeui2::getAPmac(){
+    if(mc != "") return;
+    #ifdef ESP32
+    WiFi.mode(WIFI_MODE_AP);
+    #else
+    WiFi.mode(WIFI_AP);
+    #endif
+    mc = String(WiFi.softAPmacAddress());
+    mc.replace(":", "");
+}

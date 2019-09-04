@@ -9,6 +9,7 @@ var pages;
 function make(){
     obj = JSON.parse(json);
     app = obj.app;
+    ID = obj.ID;
     pages = obj.menu.length;
     menu();
     content();
@@ -49,7 +50,10 @@ function menu(){
         else current = false;
         content += menu_item(obj.menu[i], current, i);
     }
-    content += "</ul></div>";
+    content += "<br><br>";
+    content += "<p>&nbsp&nbspID:&nbsp<b>" + ID + "</b><p>";
+    content += "</ul>";
+    content += "</div>";
     document.getElementById("menu").innerHTML = content;
 }
 

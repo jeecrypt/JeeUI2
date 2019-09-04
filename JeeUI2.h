@@ -21,8 +21,6 @@ class jeeui2
     typedef void (*buttonCallback) ();
     typedef void (*uiCallback) ();
     typedef void (*updateCallback) ();
-    //typedef void (*uiFunction) ();
-    
 
   public:
     void var(String key, String value);
@@ -56,18 +54,40 @@ class jeeui2
     void textarea(String id, String label);
     void save();
     void udp(String message);
-    
+    void udp();
+
+    void formWifi();
+    void formMqtt();
+
     uiCallback foo;
     void ui(void (*uiFunction) ());
+
+    void mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), bool remotecontrol);
+    void mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload));
+    void mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload));
+    void mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), bool remotecontrol);
+    void mqtt(String host, int port, String user, String pass, bool remotecontrol);
+    void mqtt(String pref, String host, int port, String user, String pass, bool remotecontrol);
+
+    void subscribe(String topic);
+    void publish(String topic, String payload);
+    void publish(String topic, String payload, bool retained);
+
+    void remControl(String topic, String payload);
 
     updateCallback upd;
     void update(void (*updateFunction) ());
 
     String ip;
     String buf;
+    String mc;
     String mac;
     bool connected = false;
 
+    String id(String tpoic);
+    bool remoteControl;
+    String m_pref;
+    String config = "{}";
 
   private:
     void arr(String key, String value);
@@ -85,6 +105,25 @@ class jeeui2
     void udpBegin();
     void udpLoop();
     void btn();
+    void getAPmac();
+
+    void mqtt_update();
+    void mqtt_handle();
+    void mqtt_send();
+    void mqtt_reconnect();
+    bool mqtt_ok = false;
+    bool mqtt_enable = false;
+
+    void subscribeAll();
+   
+    String m_host;
+    int m_port;
+    String m_user;
+    String m_pass;
+    bool m_params;
+
+    int sendConfig = 0;
+    
 
     String udpRemoteIP;
     unsigned int localUdpPort = 4243;
@@ -94,7 +133,7 @@ class jeeui2
     bool sv = false;
     unsigned long astimer;
 
-    String config = "{}";
+    
     String op = "";
     uint8_t wifi_mode;
     int LED_PIN = -1;
@@ -109,7 +148,5 @@ class jeeui2
     bool dbg = false;
     
 };
-
-
 
 #endif
