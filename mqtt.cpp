@@ -159,7 +159,7 @@ void mqtt_callback(char* topic, byte* payload, unsigned int len) {
 void jeeui2::remControl(String topic, String payload){
 
     if(dbg)Serial.println("RC [" + topic + " - " + payload + "]");
-    if(topic == "jee/get/")client.publish(id("jee/cfg").c_str(), (config + config + config + config).c_str(), false);
+    if(topic == "get/") client.publish(id("jee/cfg").c_str(), config.c_str(), false);
     if(topic.indexOf("set/") != -1){
         topic = topic.substring(4, topic.length());
         if(dbg) Serial.println("SET: " + topic);
