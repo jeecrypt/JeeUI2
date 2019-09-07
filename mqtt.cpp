@@ -36,7 +36,7 @@ void emptyFunction(String, String){}
 void (jeeui2::*func)(String topic, String payload);
 
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), bool remotecontrol){
-    mqtt_enable = true;
+    if(host != "" && port != 0) mqtt_enable = true;
     String _m_pref = param("m_pref");
     String _m_host = param("m_host");
     String _m_port = param("m_port");
@@ -169,15 +169,18 @@ void jeeui2::remControl(String topic, String payload){
 }
 
 void jeeui2::publish(String topic, String payload, bool retained){
+    if (!connected || !m_params || !mqtt_enable) return; 
     client.publish(id(topic).c_str(), payload.c_str(), retained);
     // if(dbg)Serial.println("Publish: [" + id(topic) + " - " + payload + "]");
 }
 
 void jeeui2::publish(String topic, String payload){
+    if (!connected || !m_params || !mqtt_enable) return; 
     publish(topic, payload, false);
 }
 
 void jeeui2::subscribe(String topic){
+    if (!connected || !m_params || !mqtt_enable) return; 
     client.subscribe(id(topic).c_str());
 }
 

@@ -6,6 +6,7 @@ void jeeui2::formMqtt(){
     number("m_port", "MQTT port");
     text("m_user", "User");
     text("m_pass", "Password");
+    button("bWF", "gray", "Reconnect");
 }
 
 void jeeui2::formWifi(){
