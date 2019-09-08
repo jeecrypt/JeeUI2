@@ -11,6 +11,8 @@
 bool _t_inc_current = false;
 String _t_tpc_current;
 String _t_pld_current;
+String _t_prf_current;
+bool _t_remotecontrol;
 
 typedef void (*mqttCallback) (String topic, String payload);
 mqttCallback mqt;
@@ -27,7 +29,7 @@ PubSubClient client(espClient);
 void mqtt_callback(char* topic, byte* payload, unsigned int length) ;
 
 String jeeui2::id(String topic){
-    if(topic == "") return topic;
+    if(m_pref == "") return topic;
     else return m_pref + '/' + topic;
 }
 
@@ -37,19 +39,19 @@ void (jeeui2::*func)(String topic, String payload);
 
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), bool remotecontrol){
     if(host != "" && port != 0) mqtt_enable = true;
-    String _m_pref = param("m_pref");
-    String _m_host = param("m_host");
-    String _m_port = param("m_port");
-    String _m_user = param("m_user");
-    String _m_pass = param("m_pass");
-    if(_m_pref == "null") var("m_pref", pref);
-    if(_m_host == "null") var("m_host", host);
-    if(_m_port == "null") var("m_port", String(port));
-    if(_m_user == "null") var("m_user", user);
-    if(_m_pass == "null") var("m_pass", pass);
+    
+    var("m_pref", pref);
+    var("m_host", host);
+    var("m_port", String(port));
+    var("m_user", user);
+    var("m_pass", pass);
 
-    if (remotecontrol) remoteControl = true;
+    mqtt_update();
+
+    _t_prf_current = m_pref;
+    if (remotecontrol) _t_remotecontrol = true;
     mqt = mqttFunction;
+    
 
 }
 
@@ -73,23 +75,28 @@ void jeeui2::mqtt(String host, int port, String user, String pass, bool remoteco
 }
 
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, bool remotecontrol){
+    getAPmac();
     mqtt(pref, host, port, user, pass, emptyFunction, remotecontrol);
 }
 
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) (), bool remotecontrol){
+    getAPmac();
     onConnect = mqttConnect;
     mqtt(pref, host, port, user, pass, emptyFunction, remotecontrol);
 
 }
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) ()){
+    getAPmac();
     onConnect = mqttConnect;
     mqtt(pref, host, port, user, pass, mqttFunction, false);
 }
 void jeeui2::mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) ()){
+    getAPmac();
     onConnect = mqttConnect;
     mqtt(mc, host, port, user, pass, mqttFunction, false);
 }
 void jeeui2::mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) (), bool remotecontrol){
+    getAPmac();
     onConnect = mqttConnect;
     mqtt(mc, host, port, user, pass, mqttFunction, remotecontrol);
 }
@@ -126,7 +133,7 @@ void jeeui2::mqtt_reconnect() {
     if(dbg)Serial.print("Attempting MQTT connection...");
     if (client.connect(mc.c_str(), m_user.c_str(), m_pass.c_str())) {
         if(dbg)Serial.println("connected");
-        if(remoteControl){
+        if(_t_remotecontrol){
             // client.subscribe(id("jee/set/#").c_str());
             client.subscribe(id("jee/get/").c_str());
             // client.publish(id("config").c_str(), config.c_str(), false);
@@ -147,25 +154,19 @@ void jeeui2::mqtt_handle(){
     mqtt_reconnect();
     client.loop();
 
-    if(_t_inc_current){
-        _t_inc_current = false;
-        remControl(_t_tpc_current, _t_pld_current);
-        _t_tpc_current = "";
-        _t_pld_current = "";
-    }
+    if(_t_inc_current) remControl();
 
 }
 
 void mqtt_callback(char* topic, byte* payload, unsigned int len) { 
     String tpc = String(topic);
-    tpc = tpc.substring(tpc.indexOf('/') + 1, tpc.length());
-    Serial.println("Message [" + tpc + "] ");
+    if(_t_prf_current != "") tpc = tpc.substring(_t_prf_current.length() + 1, tpc.length());
     String msg = ""; 
     for (int i= 0; i < len; i++) {
         msg += (char)payload[i];
     }
-    
-    if(tpc == "jee/get/" || tpc.indexOf("jee/set/") != -1){
+    Serial.println("Message [ pref: " + _t_prf_current + " >" + tpc + " -- " + msg + "] ");
+    if(tpc.startsWith("jee/get/") || tpc.startsWith("jee/set/")){
         tpc = tpc.substring(4, tpc.length());
         _t_tpc_current = tpc;
         _t_pld_current = msg;
@@ -175,16 +176,19 @@ void mqtt_callback(char* topic, byte* payload, unsigned int len) {
 
 }
 
-void jeeui2::remControl(String topic, String payload){
-
-    if(dbg)Serial.println("RC [" + topic + " - " + payload + "]");
-    if(topic == "get/") client.publish(id("jee/cfg").c_str(), config.c_str(), false);
-    if(topic.indexOf("set/") != -1){
-        topic = topic.substring(4, topic.length());
-        if(dbg) Serial.println("SET: " + topic);
-        var(topic, payload);
+void jeeui2::remControl(){
+    if(!_t_remotecontrol) return;
+    if(dbg)Serial.println("RC [" + _t_tpc_current + " - " + _t_pld_current + "]");
+    if(_t_tpc_current == "get/") client.publish(id("jee/cfg").c_str(), config.c_str(), false);
+    if(_t_tpc_current.indexOf("set/") != -1){
+        _t_tpc_current = _t_tpc_current.substring(4, _t_tpc_current.length());
+        if(dbg) Serial.println("SET: " + _t_tpc_current);
+        var(_t_tpc_current, _t_pld_current);
         as();
     }
+    _t_tpc_current = "";
+    _t_pld_current = "";
+    _t_inc_current = false;
 }
 
 void jeeui2::publish(String topic, String payload, bool retained){
@@ -224,6 +228,9 @@ void jeeui2::subscribeAll(){
             ){
             if(dbg)Serial.print(kv.key().c_str()); Serial.print(" --- "); Serial.println(kv.value().as<char*>());
             client.subscribe(id("jee/set/" + String(kv.key().c_str())).c_str());
+            client.subscribe(id("jee/get/" + String(kv.key().c_str())).c_str());
+
+            Serial.println("SSSSSSS: " + id("jee/get/"));
         }
     }
 }

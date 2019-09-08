@@ -81,7 +81,7 @@ class jeeui2
     void publish(String topic, String payload);
     void publish(String topic, String payload, bool retained);
 
-    void remControl(String topic, String payload);
+    void remControl();
 
     updateCallback upd;
     void update(void (*updateFunction) ());
@@ -93,7 +93,6 @@ class jeeui2
     bool connected = false;
 
     String id(String tpoic);
-    bool remoteControl;
     String m_pref;
     String config = "{}";
 
