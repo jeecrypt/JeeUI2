@@ -76,6 +76,24 @@ void jeeui2::mqtt(String pref, String host, int port, String user, String pass, 
     mqtt(pref, host, port, user, pass, emptyFunction, remotecontrol);
 }
 
+void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) (), bool remotecontrol){
+    onConnect = mqttConnect;
+    mqtt(pref, host, port, user, pass, emptyFunction, remotecontrol);
+
+}
+void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) ()){
+    onConnect = mqttConnect;
+    mqtt(pref, host, port, user, pass, mqttFunction, false);
+}
+void jeeui2::mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) ()){
+    onConnect = mqttConnect;
+    mqtt(mc, host, port, user, pass, mqttFunction, false);
+}
+void jeeui2::mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) (), bool remotecontrol){
+    onConnect = mqttConnect;
+    mqtt(mc, host, port, user, pass, mqttFunction, remotecontrol);
+}
+
 void jeeui2::mqtt_update(){
     if(!mqtt_enable) return;
     m_pref = param("m_pref");
@@ -113,6 +131,7 @@ void jeeui2::mqtt_reconnect() {
             client.subscribe(id("jee/get/").c_str());
             // client.publish(id("config").c_str(), config.c_str(), false);
             subscribeAll();
+            onConnect();
         }
         mqtt_ok = true; 
     } else {

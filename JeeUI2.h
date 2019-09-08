@@ -21,6 +21,7 @@ class jeeui2
     typedef void (*buttonCallback) ();
     typedef void (*uiCallback) ();
     typedef void (*updateCallback) ();
+    typedef void (*mqttCallback) ();
 
   public:
     void var(String key, String value);
@@ -68,6 +69,13 @@ class jeeui2
     void mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), bool remotecontrol);
     void mqtt(String host, int port, String user, String pass, bool remotecontrol);
     void mqtt(String pref, String host, int port, String user, String pass, bool remotecontrol);
+
+    mqttCallback onConnect;
+
+    void mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) (), bool remotecontrol);
+    void mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) ());
+    void mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) ());
+    void mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) (), bool remotecontrol);
 
     void subscribe(String topic);
     void publish(String topic, String payload);
