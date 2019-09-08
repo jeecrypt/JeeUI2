@@ -229,8 +229,6 @@ void jeeui2::subscribeAll(){
             if(dbg)Serial.print(kv.key().c_str()); Serial.print(" --- "); Serial.println(kv.value().as<char*>());
             client.subscribe(id("jee/set/" + String(kv.key().c_str())).c_str());
             client.subscribe(id("jee/get/" + String(kv.key().c_str())).c_str());
-
-            Serial.println("SSSSSSS: " + id("jee/get/"));
         }
     }
 }
