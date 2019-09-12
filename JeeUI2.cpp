@@ -11,6 +11,7 @@
 #include "mkr.h"
 #include "mui.h"
 #include "grids.h"
+#include "chk.h"
 
 #include "temp_js.h"
 
@@ -135,8 +136,14 @@ void jeeui2::begin() {
         request->send(response);
     });
 
-    server.on("/css/grids.css", HTTP_ANY, [](AsyncWebServerRequest *request) {
+    server.on("/grids.css", HTTP_ANY, [](AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse_P(200, F("text/css"), grids, grids_l);
+        response->addHeader(F("Content-Encoding"), F("gzip"));
+        request->send(response);
+    });
+
+    server.on("/chk.css", HTTP_ANY, [](AsyncWebServerRequest *request) {
+        AsyncWebServerResponse *response = request->beginResponse_P(200, F("text/css"), chk, chk_l);
         response->addHeader(F("Content-Encoding"), F("gzip"));
         request->send(response);
     });

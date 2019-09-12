@@ -99,16 +99,17 @@ function content_item(item, i){
     content += "<div class=\"pure-u-1 pure-u-md-1-3\">";
 
     if (item.type == "checkbox"){
-        content += "<label class='pure-checkbox'>"
+        content += "<br>"
+        content += "<div style=\"height: 40px;\">"
         content += "<input "
         if (typeof item.type == 'string') content += "type=\"" + item.type + "\""
         if (typeof item.id == 'string') content += "id=\"" + item.id + "\""
-        if (typeof item.name == 'string') content += "name=\"" + item.name + "\""
-        if (typeof item.placeholder == 'string') content += "placeholder=\"" + item.placeholder + "\""
         if (typeof item.value == 'string' && item.value == "true") content += " checked "
-        content += "oninput=\"data('" + item.type + "', this.id, this.value, '" + item.label + "', " + page + ", " + i + ")\">";
-        content +=  "&nbsp" + item.label
+        content += "class='checkbox' oninput=\"data('" + item.type + "', this.id, this.value, '" + item.label + "', " + page + ", " + i + ")\">";
+        content += "<label class='switch' for='" + item.id +  "'>"
+        content +=  "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + item.label
         content +=  "</label>"
+        content += "</div>";
     }
     else if(item.html == "input"){
         content += "<label id=\"" + item.id + "-val\">" + item.label + " "
