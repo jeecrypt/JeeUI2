@@ -38,13 +38,12 @@ void emptyFunction(String, String){}
 void (jeeui2::*func)(String topic, String payload);
 
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), bool remotecontrol){
-    if(host != "" && port != 0) mqtt_enable = true;
-    
-    var("m_pref", pref);
-    var("m_host", host);
-    var("m_port", String(port));
-    var("m_user", user);
-    var("m_pass", pass);
+    mqtt_enable = true;
+    if(param(F("m_pref")) == F("null")) var(F("m_pref"), pref);
+    if(param(F("m_host")) == F("null")) var(F("m_host"), host);
+    if(param(F("m_port")) == F("null")) var(F("m_port"), String(port));
+    if(param(F("m_user")) == F("null")) var(F("m_user"), user);
+    if(param(F("m_pass")) == F("null")) var(F("m_pass"), pass);
 
     mqtt_update();
 
@@ -55,28 +54,35 @@ void jeeui2::mqtt(String pref, String host, int port, String user, String pass, 
 
 }
 
+void fake(){}
+
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload)){
     mqtt(pref, host, port, user, pass, mqttFunction, false);
+    onConnect = fake;
 }
 
 void jeeui2::mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload)){
     getAPmac();
     mqtt(mc, host, port, user, pass, mqttFunction, false);
+    onConnect = fake;
 }
 
 void jeeui2::mqtt(String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), bool remotecontrol){
     getAPmac();
     mqtt(mc, host, port, user, pass, mqttFunction, remotecontrol);
+    onConnect = fake;
 }
 
 void jeeui2::mqtt(String host, int port, String user, String pass, bool remotecontrol){
     getAPmac();
     mqtt(mc, host, port, user, pass, emptyFunction, remotecontrol);
+    onConnect = fake;
 }
 
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, bool remotecontrol){
     getAPmac();
     mqtt(pref, host, port, user, pass, emptyFunction, remotecontrol);
+    onConnect = fake;
 }
 
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), void (*mqttConnect) (), bool remotecontrol){
@@ -101,14 +107,16 @@ void jeeui2::mqtt(String host, int port, String user, String pass, void (*mqttFu
     mqtt(mc, host, port, user, pass, mqttFunction, remotecontrol);
 }
 
+
+
 void jeeui2::mqtt_update(){
     if(!mqtt_enable) return;
-    m_pref = param("m_pref");
-    m_host = param("m_host");
-    m_port = param("m_port").toInt();
-    m_user = param("m_user");
-    m_pass = param("m_pass");
-    if(m_host != "" || m_port != 0) m_params = true; // проверяем, введены ли параметры для MQTT
+    m_pref = param(F("m_pref"));
+    m_host = param(F("m_host"));
+    m_port = param(F("m_port")).toInt();
+    m_user = param(F("m_user"));
+    m_pass = param(F("m_pass"));
+    if(m_host != "" && m_port != 0) m_params = true; // проверяем, введены ли параметры для MQTT
     else m_params = false;
 }
 
@@ -130,7 +138,7 @@ void jeeui2::mqtt_reconnect() {
     i = millis();
     rc = 5000;
 
-    if(dbg)Serial.print("Attempting MQTT connection...");
+    if(dbg)Serial.print(F("Attempting MQTT connection..."));
     if (client.connect(mc.c_str(), m_user.c_str(), m_pass.c_str())) {
         if(dbg)Serial.println("connected");
         if(_t_remotecontrol){
@@ -142,9 +150,9 @@ void jeeui2::mqtt_reconnect() {
         }
         mqtt_ok = true; 
     } else {
-      if(dbg)Serial.print("failed, rc=");
+      if(dbg)Serial.print(F("failed, rc="));
       if(dbg)Serial.print(client.state());
-      if(dbg)Serial.println(" try again in 5 seconds");
+      if(dbg)Serial.println(F(" try again in 5 seconds"));
       mqtt_ok = false;
     }
 }
@@ -165,8 +173,8 @@ void mqtt_callback(char* topic, byte* payload, unsigned int len) {
     for (int i= 0; i < len; i++) {
         msg += (char)payload[i];
     }
-    Serial.println("Message [ pref: " + _t_prf_current + " >" + tpc + " -- " + msg + "] ");
-    if(tpc.startsWith("jee/get/") || tpc.startsWith("jee/set/")){
+    Serial.println(String(F("Message [ pref: ")) + _t_prf_current + " >" + tpc + " -- " + msg + "] ");
+    if(tpc.startsWith(F("jee/get/")) || tpc.startsWith(F("jee/set/"))){
         tpc = tpc.substring(4, tpc.length());
         _t_tpc_current = tpc;
         _t_pld_current = msg;
@@ -215,20 +223,28 @@ void jeeui2::subscribeAll(){
     for (JsonPair kv : root) {
         String key = String(kv.key().c_str());
         if( 
-            key != "wifi"       &&
-            key != "m_pref"     &&
-            key != "m_host"     &&
-            key != "m_port"     &&
-            key != "m_user"     &&
-            key != "m_pass"     &&
-            key != "ssid"       &&
-            key != "pass"       &&
-            key != "ap_ssid"    &&
-            key != "ap_pass"
+            key != F("wifi" )      &&
+            key != F("m_pref")     &&
+            key != F("m_host" )    &&
+            key != F("m_port")     &&
+            key != F("m_user")     &&
+            key != F("m_pass")     &&
+            key != F("ssid" )      &&
+            key != F("pass")       &&
+            key != F("ap_ssid")    &&
+            key != F("ap_pass")
             ){
             if(dbg)Serial.print(kv.key().c_str()); Serial.print(" --- "); Serial.println(kv.value().as<char*>());
             client.subscribe(id("jee/set/" + String(kv.key().c_str())).c_str());
             client.subscribe(id("jee/get/" + String(kv.key().c_str())).c_str());
         }
+    }
+    if(dbg)Serial.print(F("Subscribe All"));
+}
+
+void jeeui2::pub_mqtt(String key, String value){
+    for(int i = 0; i < pub_num; i++){
+        if(key == pub_id[i]) publish(pub_id[i], value, false);
+        if(dbg)Serial.println("pub: [" + key + " - " + value + "]");
     }
 }

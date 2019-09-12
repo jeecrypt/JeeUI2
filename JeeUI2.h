@@ -56,6 +56,12 @@ class jeeui2
     void save();
     void udp(String message);
     void udp();
+    void pub(String id);
+    void pub(String id, String label);
+    void pub(String id, String label, String unit);
+    void pub(String id, String label, String unit, String bg_color);
+    void pub(String id, String label, String unit, String bg_color, String text_color);
+    void pub_mqtt(String key, String value);
 
     void formWifi();
     void formMqtt();
@@ -91,6 +97,7 @@ class jeeui2
     String mc;
     String mac;
     bool connected = false;
+    
 
     String id(String tpoic);
     String m_pref;
@@ -130,7 +137,10 @@ class jeeui2
     bool m_params;
 
     int sendConfig = 0;
-    
+
+    bool pub_enable;
+    int pub_num = 0;
+    String pub_id[512];
 
     String udpRemoteIP;
     unsigned int localUdpPort = 4243;

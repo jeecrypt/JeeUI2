@@ -2,11 +2,7 @@
  
 */ 
 
-
-
 #include "JeeUI2.h"
-
-
 
 #include "pge.h"
 #include "stl.h"
@@ -29,10 +25,10 @@ void jeeui2::var(String key, String value)
     JsonObject obj = doc.as<JsonObject>();
     obj[key] = value;
     if(dbg)Serial.print("WRITE: ");
-    if(dbg)Serial.println("key (" + key + ") value (" + value.substring(0, 15) + ")");
+    if(dbg)Serial.println("key (" + key + String(F(") value (")) + value.substring(0, 15) + String(F(") RAM: ")) + ESP.getFreeHeap());
     serializeJson(doc, result);
     config = result;
-
+    pub_mqtt(key, value);
 } 
 
 String jeeui2::param(String key) 
@@ -41,7 +37,7 @@ String jeeui2::param(String key)
     deserializeJson(doc, config);
     String value = doc[key];
     if(dbg)Serial.print("READ: ");
-    if(dbg)Serial.println("key (" + key + ") value (" + value + ")");
+    if(dbg)Serial.println("key (" + key + String(F(") value (")) + value + ")");
     return value;
     serializeJson(doc, config);
 } 
@@ -87,6 +83,18 @@ void jeeui2::begin() {
         }
         
         request->send(200, F("text/plain"), F("OK"));
+    });
+
+    server.on("/pub", HTTP_ANY, [this](AsyncWebServerRequest *request) {
+        uint8_t params = request->params();
+        AsyncWebParameter *p;
+        String value = "";
+        for (uint8_t i = 0; i < params; i++)
+        {
+          p = request->getParam(i);
+            value = param(p->name());
+        }
+        request->send(200, F("text/plain"), value);
     });
 
     server.on("/echo", HTTP_ANY, [this](AsyncWebServerRequest *request) { 
@@ -172,22 +180,21 @@ void jeeui2::handle()
     btn();
     led_handle();
     autosave();
- 
 }
 
 
 void jeeui2::nonWifiVar(){
     getAPmac();
-    String wifi = param("wifi");
-    String ssid = param("ssid");
-    String pass = param("pass");
-    String ap_ssid = param("ap_ssid");
-    String ap_pass = param("ap_pass");
-    if(wifi == "null") var("wifi", "AP");
-    if(ssid == "null") var("ssid", "JeeUI2");
-    if(pass == "null") var("pass", "");
-    if(ap_ssid == "null") var("ap_ssid", "JeeUI2-" + mc);
-    if(ap_pass == "null") var("ap_pass", "");
+    String wifi = param(F("wifi"));
+    String ssid = param(F("ssid"));
+    String pass = param(F("pass"));
+    String ap_ssid = param(F("ap_ssid"));
+    String ap_pass = param(F("ap_pass"));
+    if(wifi == F("null")) var(F("wifi"), F("AP"));
+    if(ssid == F("null")) var(F("ssid"), F("JeeUI2"));
+    if(pass == F("null")) var(F("pass"), "");
+    if(ap_ssid == F("null")) var(F("ap_ssid"), String(F("JeeUI2-")) + mc);
+    if(ap_pass == F("null")) var(F("ap_pass"), "");
 }
 
 void jeeui2::getAPmac(){

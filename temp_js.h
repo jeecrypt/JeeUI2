@@ -5,6 +5,8 @@ var page = 0;
 var obj;
 var app;
 var pages;
+var pub_int = []
+var pub_int_cnt = 0
 
 function make(){
     obj = JSON.parse(json);
@@ -58,6 +60,9 @@ function menu(){
 }
 
 function content(){
+    for(var i = 0; i < pub_int_cnt; i++){
+        clearInterval(pub_int[i])
+    }
     document.getElementById("main").innerHTML = "";
     var content = "<div class=\"header\"><h1>" + obj.menu[page] + "</h1></div>";
     content += "<div class=\"content\">";
@@ -78,8 +83,20 @@ function content(){
 }
 
 function content_item(item, i){
-    var content = "<div class=\"pure-u-1 pure-u-md-1-3\">";
+    var content = ''
+    if(item.type == "pub"){
+        content += "<div class=\"pure-u-1 pure-u-md-1-3\" style=\"background-color: " + item.bg_color + "; text-align: center; color: " + item.text_color + ";\">"
+        if(item.label != "") content += "<h2>" + item.label + "</h2>"
+        content += "<p style=\"font-size: 32pt\" id=\"" + item.id + "\">" + item.value + item.unit + "</p>"
+        content += "</div>"
+        pub_int[pub_int_cnt] = setInterval(() => {
+            pub(item.id, item.unit)
+        }, 3000);
+        pub_int_cnt++
+        return content
+    }
 
+    content += "<div class=\"pure-u-1 pure-u-md-1-3\">";
 
     if (item.type == "checkbox"){
         content += "<label class='pure-checkbox'>"
@@ -177,6 +194,15 @@ function send(id, value){
         var res = xhr.responseText;
     };
     xhr.send(formData);
+}
+
+function pub(id, unit){
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/pub?' + id, true);
+    xhr.onload = function () {
+        document.getElementById(id).innerHTML = xhr.responseText + unit;
+    };
+    xhr.send();
 }
 
 
