@@ -85,7 +85,7 @@ function content(){
 function content_item(item, i){
     var content = ''
     if(item.type == "pub"){
-        content += "<div class=\"pure-u-1 pure-u-md-1-3\" style=\"background-color: " + item.bg_color + "; text-align: center; color: " + item.text_color + ";\">"
+        content += "<div class=\"pure-u-1\" style=\"background-color: " + item.bg_color + "; text-align: center; color: " + item.text_color + ";\">"
         if(item.label != "") content += "<h2>" + item.label + "</h2>"
         content += "<p style=\"font-size: 32pt\" id=\"" + item.id + "\">" + item.value + item.unit + "</p>"
         content += "</div>"
@@ -96,7 +96,7 @@ function content_item(item, i){
         return content
     }
 
-    content += "<div class=\"pure-u-1 pure-u-md-1-3\">";
+    content += "<div class=\"pure-u-1\">";
 
     if (item.type == "checkbox"){
         content += "<br>"
