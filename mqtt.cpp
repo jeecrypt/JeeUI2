@@ -142,9 +142,7 @@ void jeeui2::mqtt_reconnect() {
     if (client.connect(mc.c_str(), m_user.c_str(), m_pass.c_str())) {
         if(dbg)Serial.println("connected");
         if(_t_remotecontrol){
-            // client.subscribe(id("jee/set/#").c_str());
             client.subscribe(id("jee/get/").c_str());
-            // client.publish(id("config").c_str(), config.c_str(), false);
             subscribeAll();
             onConnect();
         }
@@ -234,9 +232,10 @@ void jeeui2::subscribeAll(){
             key != F("ap_ssid")    &&
             key != F("ap_pass")
             ){
-            if(dbg)Serial.print(kv.key().c_str()); Serial.print(" --- "); Serial.println(kv.value().as<char*>());
-            client.subscribe(id("jee/set/" + String(kv.key().c_str())).c_str());
-            client.subscribe(id("jee/get/" + String(kv.key().c_str())).c_str());
+            for(int i = 0; i < pub_num; i++){
+                if(dbg)Serial.println(id("jee/set/" + String(kv.key().c_str())).c_str());
+                if(key != pub_id[i]) client.subscribe(id("jee/set/" + String(kv.key().c_str())).c_str());
+            }
         }
     }
     if(dbg)Serial.print(F("Subscribe All"));

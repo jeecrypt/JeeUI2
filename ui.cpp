@@ -11,9 +11,7 @@ void jeeui2::pub(String id, String label, String unit, String bg_color, String t
     buf += String(F("\"label\":\"")) + label + "\",";
     buf += String(F("\"unit\":\"")) + unit + "\"";
     buf += "},";
-    pub_id[pub_num] = id;
-    pub_num++;
-    pub_enable = true;
+    
 }
 
 void jeeui2::pub(String id, String label, String unit, String bg_color){
@@ -28,8 +26,10 @@ void jeeui2::pub(String id, String label){
     pub(id, label, "", F("#6060ff"), F("#ffffff"));
 }
 
-void jeeui2::pub(String id){
-    pub(id, "", "", F("#6060ff"), F("#ffffff"));
+void jeeui2::pubMQTT(String id){
+    pub_id[pub_num] = id;
+    pub_num++;
+    pub_enable = true;
 }
 
 void jeeui2::formMqtt(){
