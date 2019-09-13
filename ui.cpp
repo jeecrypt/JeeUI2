@@ -29,10 +29,6 @@ void jeeui2::pub(String id, String label){
     pub(id, label, "", F("#6060ff"), F("#ffffff"));
 }
 
-void jeeui2::pubMQTT(String id){
-    
-}
-
 void jeeui2::formMqtt(){
     text(F("m_host"), F("MQTT host"));
     number(F("m_port"), F("MQTT port"));
