@@ -38,6 +38,7 @@ void emptyFunction(String, String){}
 void (jeeui2::*func)(String topic, String payload);
 
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), bool remotecontrol){
+    
     mqtt_enable = true;
     if(param(F("m_pref")) == F("null")) var(F("m_pref"), pref);
     if(param(F("m_host")) == F("null")) var(F("m_host"), host);
@@ -223,10 +224,6 @@ void jeeui2::subscribeAll(){
         if( 
             key != F("wifi" )      &&
             key != F("m_pref")     &&
-            key != F("m_host" )    &&
-            key != F("m_port")     &&
-            key != F("m_user")     &&
-            key != F("m_pass")     &&
             key != F("ssid" )      &&
             key != F("pass")       &&
             key != F("ap_ssid")    &&

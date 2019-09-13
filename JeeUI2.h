@@ -56,7 +56,6 @@ class jeeui2
     void save();
     void udp(String message);
     void udp();
-    void pubMQTT(String id);
     void pub(String id, String label);
     void pub(String id, String label, String unit);
     void pub(String id, String label, String unit, String bg_color);

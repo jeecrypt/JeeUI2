@@ -162,6 +162,7 @@ void jeeui2::begin() {
 
     server.begin();
     // rc(m_callback);
+    foo();
     upd();
     mqtt_update();
     
