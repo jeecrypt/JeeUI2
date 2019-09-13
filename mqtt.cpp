@@ -51,7 +51,6 @@ void jeeui2::mqtt(String pref, String host, int port, String user, String pass, 
     _t_prf_current = m_pref;
     if (remotecontrol) _t_remotecontrol = true;
     mqt = mqttFunction;
-    
 
 }
 
@@ -229,9 +228,9 @@ void jeeui2::subscribeAll(){
             key != F("ap_ssid")    &&
             key != F("ap_pass")
             ){
-            for(int i = 0; i < pub_num; i++){
+            for(int i = 0; i < pub_num + 1; i++){
                 if(dbg)Serial.println(id("jee/set/" + String(kv.key().c_str())).c_str());
-                if(key != pub_id[i]) client.subscribe(id("jee/set/" + String(kv.key().c_str())).c_str());
+                if(key != pub_id[i]) client.subscribe(id("jee/set/" + key).c_str());
             }
         }
     }
