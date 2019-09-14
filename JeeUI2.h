@@ -15,17 +15,29 @@
 #include <ESPAsyncWebServer.h>
 #include "ArduinoJson.h"
 
+#ifdef ESP8266
+#include <ESP8266WiFi.h>
+#else
+#include <WiFi.h>
+#endif
+
+#include <AsyncMqttClient.h>
+
 #define BUTTON 0
 
 
 class jeeui2
 {
+
+    AsyncMqttClient mqttClient;
+
     typedef void (*buttonCallback) ();
     typedef void (*uiCallback) ();
     typedef void (*updateCallback) ();
     typedef void (*mqttCallback) ();
 
   public:
+  
     void var(String key, String value);
     String param(String key);
     void led(uint8_t pin, bool invert);
@@ -166,7 +178,19 @@ class jeeui2
     String udpMessage;
     
     bool dbg = false;
-    
+
+
+    void connectToMqtt();
+    void onMqttConnect();
+    static void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
+    static void onMqttSubscribe(uint16_t packetId, uint8_t qos);
+    static void onMqttUnsubscribe(uint16_t packetId);
+    static void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
+    static void onMqttPublish(uint16_t packetId);
+    static void _onMqttConnect(bool sessionPresent);
+    void check_wifi_state();
+
+
 };
 
 #endif

@@ -63,7 +63,6 @@ void jeeui2::begin(bool debug) {
 
 void jeeui2::begin() { 
     
-    
     wifi_connect();
     server.on("/post", HTTP_ANY, [this](AsyncWebServerRequest *request) {
         uint8_t params = request->params();
