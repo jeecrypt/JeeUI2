@@ -4,6 +4,8 @@
 
 #include "JeeUI2.h"
 
+#include "wi-fi.h"
+
 #include "pge.h"
 #include "stl.h"
 #include "mnu.h"
@@ -178,8 +180,10 @@ void jeeui2::led(uint8_t pin, bool invert)
 
 void jeeui2::handle()
 {
+    _connected();
     mqtt_handle();
     udpLoop();
+    
     static unsigned long timer;
     unsigned int interval = 300;
     if (timer + interval > millis())

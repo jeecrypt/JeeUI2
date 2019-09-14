@@ -1,6 +1,7 @@
 #ifndef JeeUI2_h
 #define JeeUI2_h
 
+
 #include "Arduino.h"
 
 #ifdef ESP8266
@@ -15,6 +16,7 @@
 #include "ArduinoJson.h"
 
 #define BUTTON 0
+
 
 class jeeui2
 {
@@ -126,6 +128,8 @@ class jeeui2
     void mqtt_reconnect();
     bool mqtt_ok = false;
     bool mqtt_enable = false;
+
+    void _connected();
 
     void subscribeAll();
    

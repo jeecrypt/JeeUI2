@@ -157,9 +157,8 @@ void jeeui2::mqtt_reconnect() {
 
 void jeeui2::mqtt_handle(){
     if (!connected || !m_params || !mqtt_enable) return; 
-    mqtt_reconnect();
     client.loop();
-
+    mqtt_reconnect();
     if(_t_inc_current) remControl();
 
 }
@@ -221,12 +220,16 @@ void jeeui2::subscribeAll(){
     for (JsonPair kv : root) {
         String key = String(kv.key().c_str());
         if( 
-            key != F("wifi" )      &&
-            key != F("m_pref")     &&
-            key != F("ssid" )      &&
-            key != F("pass")       &&
-            key != F("ap_ssid")    &&
-            key != F("ap_pass")
+            key != F("wifi" )     &&
+            key != F("m_pref")    &&
+            key != F("ssid" )     &&
+            key != F("pass")      &&
+            key != F("ap_ssid")   &&
+            key != F("ap_pass")   &&
+            key != F("m_host")   &&
+            key != F("m_port")   &&
+            key != F("m_user")   &&
+            key != F("m_pass") 
             ){
             for(int i = 0; i < pub_num + 1; i++){
                 if(dbg)Serial.println(id("jee/set/" + String(kv.key().c_str())).c_str());

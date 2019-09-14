@@ -1,3 +1,6 @@
+
+bool _wifi_connected = false;
+
 #include "JeeUI2.h"
 
 uint8_t macaddr[6];
@@ -21,12 +24,14 @@ void onSTAGotIP(WiFiEventStationModeGotIP ipInfo)
 {
     Serial.printf("Got IP: %s\r\n", ipInfo.ip.toString().c_str());
     Serial.printf("Connected: %s\r\n", WiFi.status() == WL_CONNECTED ? "yes" : "no");
+    _wifi_connected = true;
 }
 
 void onSTADisconnected(WiFiEventStationModeDisconnected event_info)
 {
     Serial.printf("Disconnected from SSID: %s\n", event_info.ssid.c_str());
     Serial.printf("Reason: %d\n", event_info.reason);
+    _wifi_connected = false;
 }
 #else
 void WiFiEvent(WiFiEvent_t event, system_event_info_t info)
@@ -40,10 +45,12 @@ void WiFiEvent(WiFiEvent_t event, system_event_info_t info)
         Serial.println("Connected to :" + String(WiFi.SSID()));
         Serial.print(F("Got IP: "));
         Serial.println(WiFi.localIP());
+        _wifi_connected = true;
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
         Serial.println(F("Disconnected from station, attempting reconnection"));
         WiFi.reconnect();
+        _wifi_connected = false;
         break;
     default:
         break;
@@ -51,7 +58,9 @@ void WiFiEvent(WiFiEvent_t event, system_event_info_t info)
 }
 #endif
 
-
+ void jeeui2::_connected(){
+     connected = _wifi_connected;
+ }
 
 void jeeui2::wifi_connect()
 {
@@ -68,7 +77,7 @@ void jeeui2::wifi_connect()
             WiFi.softAP(param("ap_ssid").c_str(), param("ap_pass").c_str(), 6, 0, 4);
             if(dbg)Serial.println(F("Start Wi-Fi AP mode!"));
             save();
-            connected = false;
+            _wifi_connected = false;
             break;
         }
         case 2:
@@ -112,7 +121,6 @@ void jeeui2::wifi_connect()
             }
             WiFi.macAddress(macaddr);
             ip = WiFi.localIP().toString();
-            connected = true;
             prntmac();
             if(dbg)Serial.println();
             break;
