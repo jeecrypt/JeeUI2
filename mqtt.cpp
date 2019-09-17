@@ -272,3 +272,7 @@ void jeeui2::subscribeAll(){
     }
     if(dbg)Serial.println(F("Subscribe All"));
 }
+
+void jeeui2::subscribe(String topic){
+    mqttClient.subscribe(id(topic).c_str(), 0);
+}
