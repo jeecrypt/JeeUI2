@@ -5,7 +5,7 @@ void jeeui2::pub(String id, String label, String unit, String bg_color, String t
 
     buf += String(F("{\"id\":\"")) + id + "\",";
     buf += F("\"type\":\"pub\",");
-    buf += String(F("\"value\":\"")) + param(id) + "\",";
+    buf += String(F("\"value\":\"")) + "\",";
     buf += String(F("\"bg_color\":\"")) + bg_color + "\",";
     buf += String(F("\"text_color\":\"")) + text_color + "\",";
     buf += String(F("\"label\":\"")) + label + "\",";
@@ -46,6 +46,7 @@ void jeeui2::formWifi(){
 
 void jeeui2::app(String name){
     pub_num = 0;
+    btn_num = 0;
     mn = 0;
     pg = 0;
     buf = String(F("{\"app\":\"")) + name + "\",";
@@ -168,6 +169,9 @@ void jeeui2::button(String id, String color, String label){
     buf += String(F("\"color\":\"")) + color + "\",";
     buf += String(F("\"label\":\"")) + label + "\"";
     buf += F("},");
+
+    btn_id[btn_num] = "BTN_" + id;
+    btn_num++;
 }
 
 void jeeui2::button(String id, String color, String label, int column){
@@ -177,6 +181,9 @@ void jeeui2::button(String id, String color, String label, int column){
     buf += String(F("\"label\":\"")) + label + "\",";
     buf += String(F("\"col\":\"")) + String(column) + "\"";
     buf += F("},");
+
+    btn_id[btn_num] = "BTN_" + id;
+    btn_num++;
 }
 
 void jeeui2::textarea(String id, String label){

@@ -22,6 +22,13 @@ AsyncWebServer server(80);
 
 void jeeui2::var(String key, String value) 
 { 
+    for(int i = 0; i < pub_num + 1; i++){
+        if(key == pub_id[i]){
+            // if(dbg)Serial.println("pub: " + key);
+            pub_mqtt(key, value);
+            return;
+        }
+    }
     DynamicJsonDocument doc(10000);
     String result;
     deserializeJson(doc, config);
@@ -31,7 +38,7 @@ void jeeui2::var(String key, String value)
     if(dbg)Serial.println("key (" + key + String(F(") value (")) + value.substring(0, 15) + String(F(") RAM: ")) + ESP.getFreeHeap());
     serializeJson(doc, result);
     config = result;
-    pub_mqtt(key, value);
+    
 } 
 
 String jeeui2::param(String key) 

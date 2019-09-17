@@ -157,6 +157,9 @@ class jeeui2
     int pub_num = 0;
     String pub_id[512];
 
+    int btn_num = 0;
+    String btn_id[512];
+
     String udpRemoteIP;
     unsigned int localUdpPort = 4243;
     char incomingPacket[64];

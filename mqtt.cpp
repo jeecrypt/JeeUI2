@@ -30,7 +30,7 @@ bool mqtt_connect = false;
 
 
 void jeeui2::onMqttSubscribe(uint16_t packetId, uint8_t qos) {
-  Serial.println("Subscribe acknowledged.");
+//   Serial.println("Subscribe acknowledged.");
 //   Serial.print("  packetId: ");
 //   Serial.println(packetId);
 //   Serial.print("  qos: ");
@@ -38,13 +38,13 @@ void jeeui2::onMqttSubscribe(uint16_t packetId, uint8_t qos) {
 }
 
 void jeeui2::onMqttUnsubscribe(uint16_t packetId) {
-  Serial.println("Unsubscribe acknowledged.");
+//   Serial.println("Unsubscribe acknowledged.");
 //   Serial.print("  packetId: ");
 //   Serial.println(packetId);
 }
 
 void jeeui2::onMqttPublish(uint16_t packetId) {
-  Serial.println("Publish acknowledged.");
+//   Serial.println("Publish acknowledged.");
 //   Serial.print("  packetId: ");
 //   Serial.println(packetId);
 }
@@ -237,8 +237,18 @@ void jeeui2::remControl(){
     if(_t_tpc_current.indexOf("set/") != -1){
         _t_tpc_current = _t_tpc_current.substring(4, _t_tpc_current.length());
         if(dbg) Serial.println("SET: " + _t_tpc_current);
-        var(_t_tpc_current, _t_pld_current);
-        as();
+        if (_t_tpc_current.indexOf("BTN_") != -1){
+            btnui = _t_tpc_current.substring(4, _t_tpc_current.length());
+            if(btnui == "bWF"){
+                var("wifi", "STA");
+                save();
+                ESP.restart();
+            }
+        } 
+        else {
+            var(_t_tpc_current, _t_pld_current);
+            as();
+        }
     }
     _t_tpc_current = "";
     _t_pld_current = "";
@@ -253,22 +263,28 @@ void jeeui2::subscribeAll(){
     for (JsonPair kv : root) {
         String key = String(kv.key().c_str());
         if( 
-            key != F("wifi" )     &&
-            key != F("m_pref")    &&
-            key != F("ssid" )     &&
-            key != F("pass")      &&
-            key != F("ap_ssid")   &&
-            key != F("ap_pass")   &&
-            key != F("m_host")   &&
-            key != F("m_port")   &&
-            key != F("m_user")   &&
+            key != F("wifi" )       &&
+            key != F("m_pref")      &&
+            key != F("ssid" )       &&
+            key != F("pass")        &&
+            key != F("ap_ssid")     &&
+            key != F("ap_pass")     &&
+            key != F("m_host")      &&
+            key != F("m_port")      &&
+            key != F("m_user")      &&
             key != F("m_pass") 
             ){
-            for(int i = 0; i < pub_num + 1; i++){
-                if(dbg)Serial.println(id("jee/set/" + String(kv.key().c_str())).c_str());
-                if(key != pub_id[i]) mqttClient.subscribe(id("jee/set/" + key).c_str(), 0);
-            }
+            if(dbg)Serial.println(id("jee/set/" + key));
+            mqttClient.subscribe(id("jee/set/" + key).c_str(), 0);
         }
+    }
+    for(int i = 0; i < pub_num + 1; i++){
+        if(dbg)Serial.println( "PUB =>" + id("jee/set/" + pub_id[i]));
+        mqttClient.subscribe(id("jee/set/" + pub_id[i]).c_str(), 0);
+    }
+    for(int i = 0; i < btn_num + 1; i++){
+        if(dbg)Serial.println( "BTN =>" + id("jee/set/" + btn_id[i]));
+        mqttClient.subscribe(id("jee/set/" + btn_id[i]).c_str(), 0);
     }
     if(dbg)Serial.println(F("Subscribe All"));
 }
