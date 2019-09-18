@@ -11,10 +11,9 @@ void jeeui2::pub(String id, String label, String unit, String bg_color, String t
     buf += String(F("\"label\":\"")) + label + "\",";
     buf += String(F("\"unit\":\"")) + unit + "\"";
     buf += "},";
-    
-    pub_id[pub_num] = id;
-    pub_num++;
+
     pub_enable = true;
+    pub_transport[id] = "";
 }
 
 void jeeui2::pub(String id, String label, String unit, String bg_color){
@@ -45,7 +44,6 @@ void jeeui2::formWifi(){
 
 
 void jeeui2::app(String name){
-    pub_num = 0;
     btn_num = 0;
     mn = 0;
     pg = 0;

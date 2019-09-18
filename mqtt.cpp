@@ -1,5 +1,6 @@
 #include "JeeUI2.h"
 
+
 bool _t_inc_current = false;
 String _t_tpc_current;
 String _t_pld_current;
@@ -30,23 +31,15 @@ bool mqtt_connect = false;
 
 
 void jeeui2::onMqttSubscribe(uint16_t packetId, uint8_t qos) {
-//   Serial.println("Subscribe acknowledged.");
-//   Serial.print("  packetId: ");
-//   Serial.println(packetId);
-//   Serial.print("  qos: ");
-//   Serial.println(qos);
+
 }
 
 void jeeui2::onMqttUnsubscribe(uint16_t packetId) {
-//   Serial.println("Unsubscribe acknowledged.");
-//   Serial.print("  packetId: ");
-//   Serial.println(packetId);
+
 }
 
 void jeeui2::onMqttPublish(uint16_t packetId) {
-//   Serial.println("Publish acknowledged.");
-//   Serial.print("  packetId: ");
-//   Serial.println(packetId);
+
 }
 
 typedef void (*mqttCallback) (String topic, String payload);
@@ -134,19 +127,6 @@ void jeeui2::mqtt_update(){
     else m_params = false;
 }
 
-void jeeui2::pub_mqtt(String key, String value){
-    for(int i = 0; i < pub_num; i++){
-        if(key == pub_id[i]) publish(pub_id[i], value, true);
-        if(dbg)Serial.println("pub: [" + key + " - " + value + "]");
-    }
-}
-
-void jeeui2::publish(String topic, String payload, bool retained){
-    if (!connected || !mqtt_enable) return; 
-    mqttClient.publish(id(topic).c_str(), 0, retained, payload.c_str());
-}
-
-
 bool first_connect = true;
 
 void jeeui2::mqtt_handle(){
@@ -175,14 +155,9 @@ void jeeui2::mqtt_handle(){
 void jeeui2::check_wifi_state(){
     static bool old_wifi_connected = false;
     static unsigned long i;
-    // if(old_wifi_connected == connected) return;
-
     if(i + 5000 > millis()) return;
     i = millis();
-
-    // old_wifi_connected = connected;
     if(connected && !mqtt_connected) connectToMqtt();
-
 }
 
 void jeeui2::onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
@@ -204,7 +179,6 @@ void jeeui2::onMqttConnect(){
     if(_t_remotecontrol){
         subscribeAll();
     }
-    
 }
 
 void jeeui2::onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
@@ -215,14 +189,11 @@ void jeeui2::onMqttMessage(char* topic, char* payload, AsyncMqttClientMessagePro
     for (int i= 0; i < len; i++) {
         msg += (char)payload[i];
     }
-    // Serial.println(String(F("Message [ pref: ")) + _t_prf_current + " > " + tpc + " -- " + msg + " ] ");
     if(tpc.startsWith(F("jee/get/")) || tpc.startsWith(F("jee/set/"))){
-    
         tpc = tpc.substring(4, tpc.length());
         _t_tpc_current = tpc;
         _t_pld_current = msg;
         _t_inc_current = true;
-
     }
     else mqt(tpc, msg);
 }
@@ -233,7 +204,7 @@ void jeeui2::remControl(){
     _t_inc_current = false;
     
     if(dbg)Serial.println("RC [" + _t_tpc_current + " - " + _t_pld_current + "]");
-    if(_t_tpc_current == "get/") publish("jee/cfg", config, false);
+    if(_t_tpc_current == "get/") publish("jee/cfg", deb(), false);
     if(_t_tpc_current.indexOf("set/") != -1){
         _t_tpc_current = _t_tpc_current.substring(4, _t_tpc_current.length());
         if(dbg) Serial.println("SET: " + _t_tpc_current);
@@ -257,9 +228,7 @@ void jeeui2::remControl(){
 
 void jeeui2::subscribeAll(){
     mqttClient.subscribe(id("jee/get/").c_str(), 0);
-    DynamicJsonDocument doc(10000);
-    deserializeJson(doc, config);
-    JsonObject root = doc.as<JsonObject>();
+    JsonObject root = cfg.as<JsonObject>();
     for (JsonPair kv : root) {
         String key = String(kv.key().c_str());
         if( 
@@ -278,15 +247,16 @@ void jeeui2::subscribeAll(){
             mqttClient.subscribe(id("jee/set/" + key).c_str(), 0);
         }
     }
-    for(int i = 0; i < pub_num + 1; i++){
-        if(dbg)Serial.println( "PUB =>" + id("jee/set/" + pub_id[i]));
-        mqttClient.subscribe(id("jee/set/" + pub_id[i]).c_str(), 0);
-    }
     for(int i = 0; i < btn_num + 1; i++){
         if(dbg)Serial.println( "BTN =>" + id("jee/set/" + btn_id[i]));
         mqttClient.subscribe(id("jee/set/" + btn_id[i]).c_str(), 0);
     }
     if(dbg)Serial.println(F("Subscribe All"));
+}
+
+void jeeui2::publish(String topic, String payload, bool retained){
+    if (!connected || !mqtt_enable) return; 
+    mqttClient.publish(id(topic).c_str(), 0, retained, payload.c_str());
 }
 
 void jeeui2::subscribe(String topic){

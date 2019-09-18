@@ -23,12 +23,13 @@
 
 #include <AsyncMqttClient.h>
 
-#define BUTTON 0
-
+#define BUTTON 0 
 
 class jeeui2
 {
-
+    StaticJsonDocument<8192> cfg;
+    StaticJsonDocument<128> pub_transport;
+    StaticJsonDocument<128> btn_transport;
     AsyncMqttClient mqttClient;
 
     typedef void (*buttonCallback) ();
@@ -37,11 +38,10 @@ class jeeui2
     typedef void (*mqttCallback) ();
 
   public:
-  
     void var(String key, String value);
     String param(String key);
     void led(uint8_t pin, bool invert);
-    void deb();
+    String deb();
     void ap(unsigned long interval);
     void begin();
     void begin(bool debug);
@@ -114,7 +114,6 @@ class jeeui2
 
     String id(String tpoic);
     String m_pref;
-    String config = "{}";
 
   private:
     void arr(String key, String value);
@@ -154,9 +153,6 @@ class jeeui2
     int sendConfig = 0;
 
     bool pub_enable;
-    int pub_num = 0;
-    String pub_id[32];
-    String pub_val[32];
 
     int btn_num = 0;
     String btn_id[32];

@@ -2,9 +2,9 @@
  
 */ 
 
-#include "JeeUI2.h"
 
-#include "wi-fi.h"
+
+#include "JeeUI2.h"
 
 #include "pge.h"
 #include "stl.h"
@@ -18,52 +18,47 @@
 #include "temp_js.h"
 
 AsyncWebServer server(80);
-// StaticJsonDocument<18000> doc;
 
 void jeeui2::var(String key, String value) 
 { 
-    for(int i = 0; i < pub_num + 1; i++){
-        if(key == pub_id[i]){
-            // if(dbg)Serial.println("pub: " + key);
-            pub_val[i] = value;
-            pub_mqtt(key, value);
+    if(pub_enable){
+        JsonVariant pub_key = pub_transport[key];
+        if (!pub_key.isNull()) {
+            pub_transport[key] = value;
+            if(dbg)Serial.println("Pub: [" + key + " - " + value + "]");
+            publish(key, value, true);
+            String tmp;
+            serializeJson(pub_transport, tmp);
+            deserializeJson(pub_transport, tmp);
+            tmp = "";
             return;
         }
     }
-    DynamicJsonDocument doc(10000);
-    String result;
-    deserializeJson(doc, config);
-    JsonObject obj = doc.as<JsonObject>();
-    obj[key] = value;
     if(dbg)Serial.print("WRITE: ");
     if(dbg)Serial.println("key (" + key + String(F(") value (")) + value.substring(0, 15) + String(F(") RAM: ")) + ESP.getFreeHeap());
-    serializeJson(doc, result);
-    config = result;
-    
+    cfg[key] = value;
 } 
 
 String jeeui2::param(String key) 
 { 
-    DynamicJsonDocument doc(10000);
-    deserializeJson(doc, config);
-    String value = doc[key];
+    String value = cfg[key];
     if(dbg)Serial.print("READ: ");
     if(dbg)Serial.println("key (" + key + String(F(") value (")) + value + ")");
     return value;
-    serializeJson(doc, config);
 } 
 
-void jeeui2::deb() 
+String jeeui2::deb() 
 { 
-    if(dbg)Serial.print("CONFIG: ");
-    if(dbg)Serial.println(config);
+    String cfg_str;
+    serializeJson(cfg, cfg_str);
+    return cfg_str;  
 }
 
 void jeeui2::begin(bool debug) {
     dbg = debug;
     nonWifiVar();
     load();
-    if(dbg)Serial.println("CONFIG: " + config);
+    if(dbg)Serial.println("CONFIG: " + deb());
     begin();
     if(dbg)Serial.println("RAM: " + String(ESP.getFreeHeap()));
     if(dbg)Serial.println("MAC: " + mac);
@@ -91,25 +86,19 @@ void jeeui2::begin() {
             as();
           }
         }
-        
         request->send(200, F("text/plain"), F("OK"));
     });
 
     server.on("/pub", HTTP_ANY, [this](AsyncWebServerRequest *request) {
-        uint8_t params = request->params();
         AsyncWebParameter *p;
         String value = "";
-        for (uint8_t i = 0; i < params; i++)
-        {
-          p = request->getParam(i);
-            for(int i = 0; i < pub_num + 1; i++){
-            if(p->name() == pub_id[i]){
-                value = pub_val[i];
-                break;
-            }
+        p = request->getParam(0);
+        JsonVariant pub_key = pub_transport[p->name()];
+        if (!pub_key.isNull()) {
+            value = pub_transport[p->name()].as<String>();
+            if(dbg)Serial.println("pub: [" + p->name() + " - " + value + "]");
+            return;
         }
-        
-    }
         request->send(200, F("text/plain"), value);
     });
 
@@ -120,7 +109,9 @@ void jeeui2::begin() {
     });
 
     server.on("/config", HTTP_ANY, [this](AsyncWebServerRequest *request) { 
+        String config = deb();
         request->send(200, F("text/plain"), config);
+        config = "";
     });
 
     server.on("/js/maker.js", HTTP_ANY, [this](AsyncWebServerRequest *request) {
@@ -168,19 +159,10 @@ void jeeui2::begin() {
         response->addHeader(F("Content-Encoding"), F("gzip"));
         request->send(response);
     });
-
-    // server.on("/js/maker.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    //     AsyncWebServerResponse *response = request->beginResponse_P(200, F("application/javascript"), mkr, mkr_l);
-    //     response->addHeader(F("Content-Encoding"), F("gzip"));
-    //     request->send(response);
-    // });
-
     server.begin();
-    // rc(m_callback);
     foo();
     upd();
     mqtt_update();
-    
 }
 
 void jeeui2::led(uint8_t pin, bool invert)
@@ -196,7 +178,6 @@ void jeeui2::handle()
     _connected();
     mqtt_handle();
     udpLoop();
-    
     static unsigned long timer;
     unsigned int interval = 300;
     if (timer + interval > millis())
@@ -206,7 +187,6 @@ void jeeui2::handle()
     led_handle();
     autosave();
 }
-
 
 void jeeui2::nonWifiVar(){
     getAPmac();
