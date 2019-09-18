@@ -25,6 +25,7 @@ void jeeui2::var(String key, String value)
     for(int i = 0; i < pub_num + 1; i++){
         if(key == pub_id[i]){
             // if(dbg)Serial.println("pub: " + key);
+            pub_val[i] = value;
             pub_mqtt(key, value);
             return;
         }
@@ -101,8 +102,14 @@ void jeeui2::begin() {
         for (uint8_t i = 0; i < params; i++)
         {
           p = request->getParam(i);
-            value = param(p->name());
+            for(int i = 0; i < pub_num + 1; i++){
+            if(p->name() == pub_id[i]){
+                value = pub_val[i];
+                break;
+            }
         }
+        
+    }
         request->send(200, F("text/plain"), value);
     });
 

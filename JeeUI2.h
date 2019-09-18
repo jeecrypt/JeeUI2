@@ -156,6 +156,7 @@ class jeeui2
     bool pub_enable;
     int pub_num = 0;
     String pub_id[512];
+    String pub_val[512];
 
     int btn_num = 0;
     String btn_id[512];
