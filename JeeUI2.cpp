@@ -97,7 +97,7 @@ void jeeui2::begin() {
         if (!pub_key.isNull()) {
             value = pub_transport[p->name()].as<String>();
             if(dbg)Serial.println("pub: [" + p->name() + " - " + value + "]");
-            return;
+
         }
         request->send(200, F("text/plain"), value);
     });
