@@ -155,11 +155,11 @@ class jeeui2
 
     bool pub_enable;
     int pub_num = 0;
-    String pub_id[512];
-    String pub_val[512];
+    String pub_id[32];
+    String pub_val[32];
 
     int btn_num = 0;
-    String btn_id[512];
+    String btn_id[32];
 
     String udpRemoteIP;
     unsigned int localUdpPort = 4243;
