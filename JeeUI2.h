@@ -74,8 +74,6 @@ class jeeui2
     void pub(String id, String label, String unit);
     void pub(String id, String label, String unit, String bg_color);
     void pub(String id, String label, String unit, String bg_color, String text_color);
-    void pub_mqtt(String key, String value);
-
     void formWifi();
     void formMqtt();
 
@@ -132,6 +130,8 @@ class jeeui2
     void udpLoop();
     void btn();
     void getAPmac();
+
+    void pub_mqtt(String key, String value);
 
     void mqtt_update();
     void mqtt_handle();

@@ -50,13 +50,14 @@ void emptyFunction(String, String){}
 
 void jeeui2::mqtt(String pref, String host, int port, String user, String pass, void (*mqttFunction) (String topic, String payload), bool remotecontrol){
     
-    mqtt_enable = true;
+    
     if(param(F("m_pref")) == F("null")) var(F("m_pref"), pref);
     if(param(F("m_host")) == F("null")) var(F("m_host"), host);
     if(param(F("m_port")) == F("null")) var(F("m_port"), String(port));
     if(param(F("m_user")) == F("null")) var(F("m_user"), user);
     if(param(F("m_pass")) == F("null")) var(F("m_pass"), pass);
 
+    mqtt_enable = true;
     mqtt_update();
 
     _t_prf_current = m_pref;
@@ -123,13 +124,14 @@ void jeeui2::mqtt_update(){
     m_port = param(F("m_port")).toInt();
     m_user = param(F("m_user"));
     m_pass = param(F("m_pass"));
-    if(m_host != "" && m_port != 0) m_params = true;
-    else m_params = false;
+    if(m_host == "" || m_host == "null" || m_port == 0) m_params = false;
+    else m_params = true;
 }
 
 bool first_connect = true;
 
 void jeeui2::mqtt_handle(){
+    if(!connected || !m_params) return;
     static bool st = false;
     if(!st){
         st = true;
@@ -257,6 +259,11 @@ void jeeui2::subscribeAll(){
 void jeeui2::publish(String topic, String payload, bool retained){
     if (!connected || !mqtt_enable) return; 
     mqttClient.publish(id(topic).c_str(), 0, retained, payload.c_str());
+}
+
+void jeeui2::pub_mqtt(String key, String value){
+    if(!_t_remotecontrol) return;
+    publish(key, value, true);
 }
 
 void jeeui2::subscribe(String topic){

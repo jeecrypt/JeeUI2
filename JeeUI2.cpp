@@ -26,7 +26,7 @@ void jeeui2::var(String key, String value)
         if (!pub_key.isNull()) {
             pub_transport[key] = value;
             if(dbg)Serial.println("Pub: [" + key + " - " + value + "]");
-            publish(key, value, true);
+            pub_mqtt(key, value);
             String tmp;
             serializeJson(pub_transport, tmp);
             deserializeJson(pub_transport, tmp);
