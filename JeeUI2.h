@@ -179,6 +179,8 @@ class jeeui2
     
     bool dbg = false;
 
+    bool rc;
+
 
     void connectToMqtt();
     void onMqttConnect();

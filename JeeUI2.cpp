@@ -34,6 +34,7 @@ void jeeui2::var(String key, String value)
             return;
         }
     }
+    if(rc)publish("jee/set/" + key, value, true);
     if(dbg)Serial.print("WRITE: ");
     if(dbg)Serial.println("key (" + key + String(F(") value (")) + value.substring(0, 15) + String(F(") RAM: ")) + ESP.getFreeHeap());
     cfg[key] = value;

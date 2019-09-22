@@ -26,10 +26,6 @@ String jeeui2::id(String topic){
 bool mqtt_connected = false;
 bool mqtt_connect = false;
 
-
-
-
-
 void jeeui2::onMqttSubscribe(uint16_t packetId, uint8_t qos) {
 
 }
@@ -61,7 +57,7 @@ void jeeui2::mqtt(String pref, String host, int port, String user, String pass, 
     mqtt_update();
 
     _t_prf_current = m_pref;
-    if (remotecontrol) _t_remotecontrol = true;
+    if (remotecontrol) _t_remotecontrol = true; rc = true;
     mqt = mqttFunction;
 
 }
@@ -219,8 +215,11 @@ void jeeui2::remControl(){
             }
         } 
         else {
-            var(_t_tpc_current, _t_pld_current);
-            as();
+            if(param(_t_tpc_current) != _t_pld_current){
+                var(_t_tpc_current, _t_pld_current);
+                as();
+            }
+                
         }
     }
     _t_tpc_current = "";
@@ -259,6 +258,11 @@ void jeeui2::subscribeAll(){
 void jeeui2::publish(String topic, String payload, bool retained){
     if (!connected || !mqtt_enable) return; 
     mqttClient.publish(id(topic).c_str(), 0, retained, payload.c_str());
+}
+
+void jeeui2::publish(String topic, String payload){
+    if (!connected || !mqtt_enable) return; 
+    mqttClient.publish(id(topic).c_str(), 0, false, payload.c_str());
 }
 
 void jeeui2::pub_mqtt(String key, String value){
