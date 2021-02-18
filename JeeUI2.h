@@ -9,7 +9,7 @@
 #include <FS.h>
 #else
 #include <AsyncTCP.h>
-#include "SPIFFS.h"
+#include "LittleFS.h"
 #endif
 
 #include <ESPAsyncWebServer.h>
