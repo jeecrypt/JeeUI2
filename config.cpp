@@ -2,9 +2,9 @@
 
 void jeeui2::save()
 {
-    if(SPIFFS.begin()){
+    if(LittleFS.begin()){
     }
-    File configFile = SPIFFS.open(F("/config.json"), "w");
+    File configFile = LittleFS.open(F("/config.json"), "w");
     
     String cfg_str;
     serializeJson(cfg, cfg_str);
@@ -39,9 +39,9 @@ void jeeui2::as(){
 
 void jeeui2::load()
 {
-    if(SPIFFS.begin()){
+    if(LittleFS.begin()){
     }
-    File pre_configFile = SPIFFS.open(F("/config.json"), "r");
+    File pre_configFile = LittleFS.open(F("/config.json"), "r");
     if (pre_configFile.readString() == "")
     {
         if(dbg)Serial.println(F("Failed to open config file"));
