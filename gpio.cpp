@@ -53,7 +53,7 @@ void jeeui2::btn()
         if (t + 15000 < millis()) // Нажатие 10 секунд
         {
             led_inv();
-            SPIFFS.remove("/config.json");
+            LittleFS.remove("/config.json");
             ESP.restart();
         }
     }
